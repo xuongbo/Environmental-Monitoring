@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Mqtt Allpication</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="title_activity_main_view">FullscreenActivity</string>
+    <string name="map_key">map_key</string>
+    <string name="title_activity_maps_view">Map</string>
+</resources>
