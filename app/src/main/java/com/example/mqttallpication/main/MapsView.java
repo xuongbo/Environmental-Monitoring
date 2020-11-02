@@ -76,37 +76,28 @@ import java.util.Queue;
 import java.util.Random;
 
 
-public class MapsView extends AppCompatActivity implements GoogleMap.OnMarkerClickListener,OnMapReadyCallback{
-
+public class MapsView extends AppCompatActivity implements GoogleMap.OnMarkerClickListener, OnMapReadyCallback {
     private GoogleMap mMap;
-
     private View myView;
+    private MqttAndroidClient client;
+    public Integer oldDate;
+    private static final String TAG = "mqtt";
 
     public int[] time = new int[12];
-
     public Float[][] m0 = new Float[2][12];
-
     public Float[][] m1 = new Float[2][12];
-
     public Float[][] m2 = new Float[2][12];
 
-    public Location location =  new Location();
-
-    public Parameter parameter =  new Parameter();
-
+    public Location location = new Location();
+    public Parameter parameter = new Parameter();
     public GetLocation getLocation = new GetLocation();
-
     public GetParameter getParameter = new GetParameter();
-
-    private MqttAndroidClient client;
-
-    public Integer oldDate;
 
     //Auto create data for a while
     private Runnable runner = new Runnable() {
         @Override
         public void run() {
-            while (true){
+            while (true) {
                 try {
                     Thread.sleep(5000);
                 } catch (InterruptedException e) {
@@ -120,6 +111,7 @@ public class MapsView extends AppCompatActivity implements GoogleMap.OnMarkerCli
             }
         }
     };
+
     //Start connect to MqttCloud
     //It will be start immediately when open application
     public void startConnect() {
@@ -138,7 +130,7 @@ public class MapsView extends AppCompatActivity implements GoogleMap.OnMarkerCli
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
                     // We are connected
-                    Log.d("gg", "onSuccess");
+                    Log.d(TAG, "onSuccess");
                     setSubscribe("Location");
                     setSubscribe("Parameter");
                 }
@@ -146,7 +138,7 @@ public class MapsView extends AppCompatActivity implements GoogleMap.OnMarkerCli
                 @Override
                 public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
                     // Something went wrong e.g. connection timeout or firewall problems
-                    Log.d("ff", "onFailure");
+                    Log.d(TAG, "onFailure");
                     exception.printStackTrace();
 
                 }
@@ -160,7 +152,7 @@ public class MapsView extends AppCompatActivity implements GoogleMap.OnMarkerCli
                 @Override
                 public void messageArrived(String topic, MqttMessage message) {
                     String string = new String(message.getPayload());
-                    switch (topic){
+                    switch (topic) {
                         case "Location":
                             location = getLocation.getLocation(string);
                             break;
@@ -170,6 +162,7 @@ public class MapsView extends AppCompatActivity implements GoogleMap.OnMarkerCli
                     }
                     swipeData1();
                 }
+
                 @Override
                 public void deliveryComplete(IMqttDeliveryToken token) {
 
@@ -179,10 +172,11 @@ public class MapsView extends AppCompatActivity implements GoogleMap.OnMarkerCli
             e.printStackTrace();
         }
     }
+
     //Subscribe topic
-    private void setSubscribe(String topic){
+    private void setSubscribe(String topic) {
         try {
-            client.subscribe(topic,0);
+            client.subscribe(topic, 0);
         } catch (MqttException e) {
             e.printStackTrace();
         }
@@ -217,18 +211,18 @@ public class MapsView extends AppCompatActivity implements GoogleMap.OnMarkerCli
         // initialize as invisible (could also do in xml)
         // Set data in arrays
         // Only one location is real data, remains are fake.
-        for (int i = 0;i < 12; i++){
+        for (int i = 0; i < 12; i++) {
             m0[0][i] = 0f;
             m0[1][i] = 0f;
         }
-        for (int i = 0;i < 11; i++){
+        for (int i = 0; i < 11; i++) {
             m1[0][i] = Float.parseFloat(new GenerateData().generatePm());
             m2[0][i] = Float.parseFloat(new GenerateData().generatePm());
         }
         //Set real Pm 2.5 index for fake location.
         m1[0][11] = Float.parseFloat(pm2[0].split(" ")[1]);
         m2[0][11] = Float.parseFloat(pm2[1].split(" ")[1]);
-        for (int i = 0;i < 12; i++){
+        for (int i = 0; i < 12; i++) {
             m1[1][i] = Float.parseFloat(new GenerateData().generatePm());
             m2[1][i] = Float.parseFloat(new GenerateData().generatePm());
         }
@@ -269,24 +263,24 @@ public class MapsView extends AppCompatActivity implements GoogleMap.OnMarkerCli
         queue.add(m2);
 
         //Put three locations on the map
-        HashMap<Double,Double> testLocation = new HashMap<>();
-        testLocation.put(21.006111,105.843056);
+        HashMap<Double, Double> testLocation = new HashMap<>();
+        testLocation.put(21.006111, 105.843056);
         testLocation.put(21.006956, 105.8336606);
         testLocation.put(21.002641, 105.815678);
         int i = 0;
         //Add Pm 2.5 on marker and make it look serious
         for (Map.Entry<Double, Double> entry : testLocation.entrySet()) {
             Float[][] m = queue.poll();
-            int mc = Math.round( m[0][11]);
+            int mc = Math.round(m[0][11]);
             LatLng currentLocation = new LatLng(entry.getKey(), entry.getValue());
             float zoomLevel = 15.5f;
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation, zoomLevel));
             IconGenerator iconGenerator = new IconGenerator(MapsView.this);
 
             //Depends on Pm 2.5 index of range, it will show marker with different color
-            if (mc >=0 && mc <12) iconGenerator.setStyle(IconGenerator.STYLE_GREEN);
-            else if (mc >= 12 && mc <55.4) iconGenerator.setStyle(IconGenerator.STYLE_ORANGE);
-            else if (mc >= 55.4 && mc <150.5) iconGenerator.setStyle(IconGenerator.STYLE_RED);
+            if (mc >= 0 && mc < 12) iconGenerator.setStyle(IconGenerator.STYLE_GREEN);
+            else if (mc >= 12 && mc < 55.4) iconGenerator.setStyle(IconGenerator.STYLE_ORANGE);
+            else if (mc >= 55.4 && mc < 150.5) iconGenerator.setStyle(IconGenerator.STYLE_RED);
             else iconGenerator.setStyle(IconGenerator.STYLE_PURPLE);
 
             //Set number on marker.
@@ -304,8 +298,8 @@ public class MapsView extends AppCompatActivity implements GoogleMap.OnMarkerCli
                     bottomSheetBehavior = BottomSheetBehavior.from(myView);
                     bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
 
-                    }
-                });
+                }
+            });
         }
 
     }
@@ -325,31 +319,30 @@ public class MapsView extends AppCompatActivity implements GoogleMap.OnMarkerCli
         TextView pm10 = findViewById(R.id.pm10);
 
         //Set data for marker, it will show different information depend on marker was picked
-        if (marker.getId().equals("m0")){
+        if (marker.getId().equals("m0")) {
             DecimalFormat numberFormat = new DecimalFormat("#0.00");
 
-               location1.setText(location.getLocation());
-               temperature.setText(parameter.getTemperature() +" °C");
-               humid.setText(parameter.getHumid()+" %");
-               pm2.setText(numberFormat.format(parameter.getPm2())+" µg/m3");
-               pm10.setText(numberFormat.format(parameter.getPm10())+" µg/m3");
-               barChart(m0[0],m0[1]);
+            location1.setText(location.getLocation());
+            temperature.setText(parameter.getTemperature() + " °C");
+            humid.setText(parameter.getHumid() + " %");
+            pm2.setText(numberFormat.format(parameter.getPm2()) + " µg/m3");
+            pm10.setText(numberFormat.format(parameter.getPm10()) + " µg/m3");
+            barChart(m0[0], m0[1]);
 
-        }else if (marker.getId().equals("m1")){
-
-                location1.setText("Trường mầm non Kim Liên");
-                temperature.setText((new Random().nextInt(10 + 5)+25) +" °C");
-                humid.setText((new Random().nextInt(20 + 1)+80) +" %");
-                pm2.setText( m1[0][11] +" µg/m3");
-                pm10.setText(m1[1][11]  +" µg/m3");
-                barChart(m1[0],m1[1]);
-            }else {
-                location1.setText("Royal City");
-                temperature.setText((new Random().nextInt(10 + 5) + 25) + " °C");
-                humid.setText((new Random().nextInt(20 + 1)+80) + " %");
-                pm2.setText( m2[0][11]+" µg/m3");
-                pm10.setText(m2[1][11]  +" µg/m3");
-                barChart(m2[0],m2[1]);
+        } else if (marker.getId().equals("m1")) {
+            location1.setText("Trường mầm non Kim Liên");
+            temperature.setText((new Random().nextInt(10 + 5) + 25) + " °C");
+            humid.setText((new Random().nextInt(20 + 1) + 80) + " %");
+            pm2.setText(m1[0][11] + " µg/m3");
+            pm10.setText(m1[1][11] + " µg/m3");
+            barChart(m1[0], m1[1]);
+        } else {
+            location1.setText("Royal City");
+            temperature.setText((new Random().nextInt(10 + 5) + 25) + " °C");
+            humid.setText((new Random().nextInt(20 + 1) + 80) + " %");
+            pm2.setText(m2[0][11] + " µg/m3");
+            pm10.setText(m2[1][11] + " µg/m3");
+            barChart(m2[0], m2[1]);
         }
         //Set peek height for view, it will only being seen for initial data.
         myView.setVisibility(View.VISIBLE);
@@ -360,7 +353,7 @@ public class MapsView extends AppCompatActivity implements GoogleMap.OnMarkerCli
 
 
     //Create bar charts and show recorded data in one day.
-    public void barChart(Float[] m1, Float[] m2){
+    public void barChart(Float[] m1, Float[] m2) {
         BarChart chart1 = findViewById(R.id.barchart1);
         LineChart chart2 = findViewById(R.id.linechart);
 
@@ -368,23 +361,23 @@ public class MapsView extends AppCompatActivity implements GoogleMap.OnMarkerCli
         List<BarEntry> bar1 = new ArrayList<>();
         List<Entry> bar2 = new ArrayList<>();
         int k = 0;
-        for(Float list : m1){
+        for (Float list : m1) {
             bar1.add(new BarEntry(k++, list));
         }
         k = 0;
-        for(Float list : m2){
+        for (Float list : m2) {
             bar2.add(new BarEntry(k++, list));
         }
         ArrayList<String> xAxisLabel = new ArrayList<>();
-        for (int hour:time){
-            xAxisLabel.add(hour+"h");
+        for (int hour : time) {
+            xAxisLabel.add(hour + "h");
         }
         //Create charts for showing and show animation by delaying for 1000ms.
-        BarDataSet barDataSet1 = new BarDataSet(bar1,"pm 2.5");
-        LineDataSet barDataSet2 = new LineDataSet(bar2,"pm 10");
+        BarDataSet barDataSet1 = new BarDataSet(bar1, "pm 2.5");
+        LineDataSet barDataSet2 = new LineDataSet(bar2, "pm 10");
 
-        chart1.animateXY(1000,1000);
-        chart2.animateXY(1000,1000);
+        chart1.animateXY(1000, 1000);
+        chart2.animateXY(1000, 1000);
         chart1.setClickable(false);
         chart2.setClickable(false);
         chart1.getLegend().setTextColor(Color.WHITE);
@@ -444,32 +437,33 @@ public class MapsView extends AppCompatActivity implements GoogleMap.OnMarkerCli
     }
 
     //Change thread priority and start.
-    public void autoGenerate(){
+    public void autoGenerate() {
         Thread thread = new Thread(runner);
         thread.setPriority(Thread.NORM_PRIORITY);
         thread.start();
     }
+
     //Push old data back to the left and add new data to the right by swipe data.
     //Each method using for each location.
-    public void swipeData2(){
+    public void swipeData2() {
         //auto generate Data for Location 2
         String[] pm2 = new GetPm25().getPm2Now();
         String pm_2 = pm2[0].split(" ")[1];
-        for (int i = 0; i <11; i++){
-            m1[0][i] = m1[0][i+1];
+        for (int i = 0; i < 11; i++) {
+            m1[0][i] = m1[0][i + 1];
         }
         m1[0][11] = Float.parseFloat(pm_2);
         String pm_10 = new GenerateData().generatePm();
-        for (int i = 0; i <11; i++){
-            m1[1][i] = m1[1][i+1];
+        for (int i = 0; i < 11; i++) {
+            m1[1][i] = m1[1][i + 1];
         }
         m1[1][11] = Float.parseFloat(pm_10);
     }
 
-    public void swipeData3(){
+    public void swipeData3() {
         //auto generate Data for Location 3
         String[] pm2 = new GetPm25().getPm2Now();
-        String pm_2 =pm2[1].split(" ")[1];
+        String pm_2 = pm2[1].split(" ")[1];
         System.arraycopy(m2[0], 1, m2[0], 0, 11);
         m2[0][11] = Float.parseFloat(pm_2);
         String pm_10 = new GenerateData().generatePm();
@@ -477,7 +471,7 @@ public class MapsView extends AppCompatActivity implements GoogleMap.OnMarkerCli
         m2[1][11] = Float.parseFloat(pm_10);
     }
 
-    public void swipeData1(){
+    public void swipeData1() {
         System.arraycopy(m0[0], 1, m0[0], 0, 11);
         m0[0][11] = parameter.getPm2();
 
@@ -487,19 +481,19 @@ public class MapsView extends AppCompatActivity implements GoogleMap.OnMarkerCli
 
     //Set weather image in realtime
     //It will be split into day and night.
-    public void weather(){
+    public void weather() {
         ImageView weather = findViewById(R.id.weather);
         String status = null;
         try {
-//            status = new GetWeather().getStatusNow();
+            status = new GetWeather().getStatusNow();
             if (status.equals("null")) status = "default";
         } catch (Exception e) {
             status = "default";
         }
-        if (oldDate <= 18 && oldDate >= 6){
+        if (oldDate <= 18 && oldDate >= 6) {
 
             //Show status of weather on the day
-            switch (status){
+            switch (status) {
                 case "Cloudy":
                 case "Partly Cloudy":
                     weather.setImageResource(R.drawable.cloudy);
@@ -526,10 +520,10 @@ public class MapsView extends AppCompatActivity implements GoogleMap.OnMarkerCli
                     weather.setImageResource(R.drawable.mist);
                     break;
             }
-        }else{
+        } else {
 
             //Show weather status of the night
-            switch (status){
+            switch (status) {
                 case "Cloudy":
                     weather.setImageResource(R.drawable.cloudy);
                     break;
@@ -559,6 +553,4 @@ public class MapsView extends AppCompatActivity implements GoogleMap.OnMarkerCli
             }
         }
     }
-
-
 }

@@ -12,13 +12,13 @@ public class GenerateData {
 
     DecimalFormat numberFormat = new DecimalFormat("#0.00");
 
-    public String generatePm(){
-        return numberFormat.format(new Random().nextDouble()*40+30);
+    public String generatePm() {
+        return numberFormat.format(new Random().nextDouble() * 40 + 30);
     }
 
     //Get current time in Hanoi
     @SuppressLint("SimpleDateFormat")
-    public String getDate(){
+    public String getDate() {
         String time = null;
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("HH");
         Date date = new Date();
@@ -27,30 +27,29 @@ public class GenerateData {
     }
 
     //Swipe timeline base on current time
-    public int[] swipeDate(int currentDate){
+    public int[] swipeDate(int currentDate) {
         int[] time = new int[12];
         int i = 11;
         int hour = currentDate;
         time[i] = currentDate;
-        for (int j = 10; j >0;j--){
-            if (currentDate >= 0){
+        for (int j = 10; j > 0; j--) {
+            if (currentDate >= 0) {
                 time[i] = currentDate;
-                currentDate-=2;
-                i=j;
-            }
-            else{
-                if (hour % 2 ==0){
+                currentDate -= 2;
+                i = j;
+            } else {
+                if (hour % 2 == 0) {
                     currentDate = 24;
                     break;
-                }else{
+                } else {
                     currentDate = 23;
                     break;
                 }
             }
         }
-        while (i>=0){
+        while (i >= 0) {
             time[i] = currentDate;
-            currentDate-=2;
+            currentDate -= 2;
             i--;
         }
 

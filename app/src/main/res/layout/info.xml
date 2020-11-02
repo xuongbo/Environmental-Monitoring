@@ -30,9 +30,11 @@
         android:id="@+id/humid"
         android:layout_width="76dp"
         android:layout_height="34dp"
+        android:layout_above="@+id/barchart1"
         android:layout_below="@+id/location"
         android:layout_marginTop="114dp"
         android:layout_marginEnd="-150dp"
+        android:layout_marginBottom="43dp"
         android:layout_toStartOf="@+id/pm2"
         android:background="@drawable/popup_curved"
         android:gravity="center"
@@ -83,12 +85,14 @@
         android:id="@+id/pm10"
         android:layout_width="160dp"
         android:layout_height="wrap_content"
+        android:layout_above="@+id/barchart1"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_marginStart="212dp"
         android:layout_marginTop="212dp"
         android:layout_marginEnd="39dp"
+        android:layout_marginBottom="39dp"
         android:background="@drawable/popup_curved"
         android:gravity="center"
         android:text="pm10"
@@ -109,10 +113,10 @@
         android:id="@+id/barchart1"
         android:layout_width="390dp"
         android:layout_height="193dp"
+        android:layout_above="@+id/linechart"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentBottom="true"
         android:layout_marginEnd="10dp"
-        android:layout_marginBottom="271dp" />
+        android:layout_marginBottom="34dp" />
 
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/linechart"
@@ -179,10 +183,12 @@
         android:id="@+id/textView6"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_above="@+id/barchart1"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_marginStart="164dp"
         android:layout_marginTop="210dp"
+        android:layout_marginBottom="41dp"
         android:text="Pm 10"
         android:textColor="#FFFFFF" />
 </RelativeLayout>
